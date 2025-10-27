@@ -42,8 +42,10 @@ function ListButton.new(instance, list)
 
     instance.Parent = listInstance
     instance.MouseButton1Click:Connect(function()
-        if not ctrlHeld and listButton.Callback then
+        if not ctrlHeld and listButton.Callback and not pressHold then
             listButton.Callback()
+        elseif not ctrlHeld and listButton.RightCallback and pressHold then
+			listButton.RightCallback()
         elseif list.MultiClickEnabled and ctrlHeld then
             if not list.Selected then
                 list.Selected = {}
@@ -117,6 +119,11 @@ function List.bindContextMenu(list, contextMenu)
 
         list.Instance.ChildAdded:Connect(function(instance)
             instance.MouseButton2Click:Connect(showContextMenu)
+            instance.MouseButton1Click:Connect(function()
+            	if pressHold then
+            		showContextMenu()
+            	end
+            end)
         end)
 
         list.BoundContextMenu = contextMenu
@@ -133,6 +140,11 @@ function List.bindContextMenuSelected(list, contextMenu)
 
         list.Instance.ChildAdded:Connect(function(instance)
             instance.MouseButton2Click:Connect(showContextMenu)
+            instance.MouseButton1Click:Connect(function()
+            	if pressHold then
+            		showContextMenu()
+            	end
+            end)
         end)
 
         list.BoundContextMenuSelected = contextMenu
@@ -165,7 +177,7 @@ end
 oh.Events.ListInputBegan = UserInput.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.LeftControl then
         ctrlHeld = true
-    elseif not ctrlHeld and input.UserInputType == Enum.UserInputType.MouseButton1 then
+    elseif not ctrlHeld and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
         for _i, list in pairs(lists) do
             if list.Selected then
                 for _k, listButton in pairs(list.Selected) do
