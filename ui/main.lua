@@ -64,7 +64,7 @@ local dragStart
 local startPos
 
 Drag.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 		local dragEnded 
 
 		dragging = true
@@ -81,20 +81,32 @@ Drag.InputBegan:Connect(function(input)
 end)
 
 oh.Events.Drag = UserInput.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+	if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) and dragging then
 		local delta = input.Position - dragStart
 		Base.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 	end
 end)
 
-Open.MouseButton1Click:Connect(function()
+local function openUI()
 	Open:TweenPosition(constants.conceal, "Out", "Quad", 0.15)
 	Base:TweenPosition(constants.opened, "Out", "Quad", 0.15)
-end)
+end
 
-Collapse.MouseButton1Click:Connect(function()
+local function collapseUI()
 	Base:TweenPosition(constants.closed, "Out", "Quad", 0.15)
 	Open:TweenPosition(constants.reveal, "Out", "Quad", 0.15)
+end
+
+Open.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		openUI()
+	end
+end)
+
+Collapse.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		collapseUI()
+	end
 end)
 
 Interface.Name = HttpService:GenerateGUID(false)
