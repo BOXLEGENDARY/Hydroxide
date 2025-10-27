@@ -114,6 +114,16 @@ local function addElement(upvalueLog, upvalue, index, value, temporary)
         elementTypeDropdown:SetSelected(typeof(value))
         elementContextMenu:Show()
     end)
+    
+    elementLog.MouseButton1Click:Connect(function()
+    	if pressHold then
+	        selectedUpvalue = upvalue
+	        selectedUpvalueLog = upvalueLog
+	        selectedElement = index
+	        elementTypeDropdown:SetSelected(typeof(value))
+	        elementContextMenu:Show()
+        end
+    end)
 
     return elementLog
 end
@@ -190,6 +200,20 @@ local function addUpvalue(upvalue, temporary)
             upvalueContextMenu:Show()
         end
     end)
+    
+	upvalueLog.MouseButton1Click:Connect(function()
+		if pressHold then
+	        selectedUpvalue = upvalue
+	        selectedUpvalueLog = upvalueLog
+	        upvalueTypeDropdown:SetSelected(typeof(upvalue.Value))
+	
+	        if upvalue.Scanned then
+	            tableContextMenu:Show()
+	        else
+	            upvalueContextMenu:Show()
+	        end
+		end
+	end)
 
     return upvalueLog
 end
@@ -313,13 +337,13 @@ upvalueList:BindContextMenu(closureContextMenu)
 
 deepSearch:SetCallback(function(enabled)
     deepSearchFlag = enabled
-    
     if enabled then
         MessageBox.Show("Notice", "Deep searching may result in longer scan times!", MessageType.OK)
     end
 end)
 
 Search.MouseButton1Click:Connect(addUpvalues)
+
 SearchBox.FocusLost:Connect(function(returned)
     if returned then
         addUpvalues()
@@ -385,7 +409,7 @@ modifyUpvalueButtons.Set.MouseButton1Click:Connect(function()
         selectedUpvalue:Set(newValue)
 
         modifyUpvalueValue.Text = ""
-        modifyUpvalue:Hide()
+        --modifyUpvalue:Hide()
     end
 end)
 
